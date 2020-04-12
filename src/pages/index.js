@@ -23,11 +23,13 @@ const IndexPage = () => {
   return (
     <Layout>
       <SEO title="Login" />
-      <FormGroup>
-        <FormLabel htmlFor="#username">Username</FormLabel>
-        <Input id="username" onChange={e => setUsername(e.target.value)}></Input>
-        <Button onClick={handleLogin}>Ok</Button>
-      </FormGroup>
+      <form onSubmit={e => { e.preventDefault(); handleLogin(); }}>
+       <FormGroup>
+          <FormLabel htmlFor="#username">Username</FormLabel>
+          <Input id="username" onChange={e => setUsername(e.target.value)}></Input>
+          <Button type="submit">Ok</Button>
+       </FormGroup>
+      </form>
     </Layout>
   )
 }
