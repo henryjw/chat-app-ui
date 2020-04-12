@@ -1,7 +1,7 @@
 /** @typedef { import('../../types').ChatMessage } ChatMessage  */
 
 import React, { useState } from "react"
-import { Button, Input, Container, List, ListItem } from '@material-ui/core'
+import { Button, Input, Container, List, ListItem, FormGroup } from '@material-ui/core'
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -29,6 +29,7 @@ const ChatPage = () => {
     const sendMessage = () => {
         setMessages(messages.concat([buildMessage(message)]));
         clearText();
+        return false;
     }
 
     // TODO: Check if user is logged in before loading page
@@ -37,10 +38,10 @@ const ChatPage = () => {
             <SEO title="Chat" />
             <Container>
                 <Chat messages={messages}/>
-                <Container>
-                    <Input required value={message} onChange={e => setMessage(e.target.value)} onSubmit={sendMessage} />
-                    <Button onClick={sendMessage}>Send</Button>
-                </Container>
+                <form onSubmit={e => { e.preventDefault(); sendMessage() }}>
+                    <Input required value={message} onChange={e => setMessage(e.target.value)} />
+                    <Button type="submit">Send</Button>
+                </form>
             </Container>
         </Layout>
     )
