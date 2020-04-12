@@ -1,8 +1,7 @@
 /** @typedef { import('../../types').ChatMessage } ChatMessage  */
 
-import React from "react"
-import { navigate } from 'gatsby'
-import { Button, FormLabel, Input, FormGroup, Container, List, ListItem } from '@material-ui/core'
+import React, { useState } from "react"
+import { Button, Input, Container, List, ListItem } from '@material-ui/core'
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -10,22 +9,42 @@ import fakeMessages from "../utils/fakeMessages";
 
 
 const ChatPage = () => {
+    const [message, setMessage] = useState('')
+    const [messages, setMessages] = useState(fakeMessages)
+    const username = localStorage.getItem('username')
+
+    /**
+     * 
+     * @param {String} message
+     * @returns {ChatMessage} 
+     */
+    const buildMessage = message => ({
+        message,
+        authorUsername: username,
+        time: new Date()
+    })
+
+    const clearText = () => setMessage('')
+
+    const sendMessage = () => {
+        setMessages(messages.concat([buildMessage(message)]));
+        clearText();
+    }
+
     // TODO: Check if user is logged in before loading page
     return (
         <Layout>
             <SEO title="Chat" />
             <Container>
-                <Chat messages={fakeMessages}/>
+                <Chat messages={messages}/>
                 <Container>
-                    <Input/>
-                    <Button>Send</Button>
+                    <Input required value={message} onChange={e => setMessage(e.target.value)} onSubmit={sendMessage} />
+                    <Button onClick={sendMessage}>Send</Button>
                 </Container>
             </Container>
         </Layout>
     )
 }
-
-
 
 /**
  * 
