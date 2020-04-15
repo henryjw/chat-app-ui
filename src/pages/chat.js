@@ -30,7 +30,7 @@ const ChatPage = () => {
     const buildMessage = message => ({
         message,
         username,
-        time: new Date()
+        createTime: new Date()
     })
 
     const clearText = () => setMessage('')
@@ -65,7 +65,7 @@ const Chat = (props) => {
     const { messages } = props
 
     const messageListItems = messages.map(message => (
-        <ListItem key={`${message.username}:${message.time.getMilliseconds()}`}>
+        <ListItem key={`${message.username}:${message.createTime.getMilliseconds()}`}>
             <span>{message.username}: {message.message}</span>
         </ListItem>
     ))

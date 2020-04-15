@@ -1,19 +1,20 @@
 /** @typedef { import('../../types').ChatMessage } ChatMessage */
 
+import axios from 'axios'
+
+
+
 /**
  * @return {Promise<Array<ChatMessage>>}
  */
 export async function getMessages() {
-    return [
-        {
-            username: 'user1',
-            message: "Hello, world!",
-            time: new Date()
-        },
-        {
-            username: 'user22',
-            message: "Hi",
-            time: new Date()
-        }
-    ]
+    const { data } = await axios.get('http://localhost:3000/messages')
+
+    const result = data.items.map(item => ({
+        username: item.Username,
+        message: item.Message,
+        createTime: new Date(item.CreateTime)
+    }));
+
+    return result;
 }
