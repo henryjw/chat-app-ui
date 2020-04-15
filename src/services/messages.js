@@ -2,8 +2,6 @@
 
 import axios from 'axios'
 
-
-
 /**
  * @return {Promise<Array<ChatMessage>>}
  */

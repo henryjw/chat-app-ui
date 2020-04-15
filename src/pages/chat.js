@@ -36,6 +36,7 @@ const ChatPage = () => {
     const clearText = () => setMessage('')
 
     const sendMessage = () => {
+        // TODO: call service instead of appending in memory
         setMessages(messages.concat([buildMessage(message)]));
         clearText();
         return false;
