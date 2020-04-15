@@ -1,6 +1,6 @@
 export interface ChatMessage {
     message: String
-    authorUsername: String
+    username: String
 
     /** Time the message was created */
     time: Date

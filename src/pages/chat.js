@@ -1,17 +1,26 @@
 /** @typedef { import('../../types').ChatMessage } ChatMessage  */
 
-import React, { useState } from "react"
-import { Button, Input, Container, List, ListItem, FormGroup } from '@material-ui/core'
+import React, { useState, useEffect } from "react"
+import { Button, Input, Container, List, ListItem } from '@material-ui/core'
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import fakeMessages from "../utils/fakeMessages";
+import { getMessages } from "../services/messages";
 
 
 const ChatPage = () => {
     const [message, setMessage] = useState('')
-    const [messages, setMessages] = useState(fakeMessages)
+    const [messages, setMessages] = useState([])
     const username = localStorage.getItem('username')
+
+    // This should only be called when component is loaded
+    // https://stackoverflow.com/a/53121021/6530609
+    useEffect(() => {
+        // TODO: show loader until messages are received
+        getMessages()
+            .then(setMessages)
+            .catch(console.error)  
+    }, [])
 
     /**
      * 
@@ -20,7 +29,7 @@ const ChatPage = () => {
      */
     const buildMessage = message => ({
         message,
-        authorUsername: username,
+        username,
         time: new Date()
     })
 
@@ -56,8 +65,8 @@ const Chat = (props) => {
     const { messages } = props
 
     const messageListItems = messages.map(message => (
-        <ListItem key={`${message.authorUsername}:${message.time.getMilliseconds()}`}>
-            <span>{message.authorUsername}: {message.message}</span>
+        <ListItem key={`${message.username}:${message.time.getMilliseconds()}`}>
+            <span>{message.username}: {message.message}</span>
         </ListItem>
     ))
 
