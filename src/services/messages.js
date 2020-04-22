@@ -6,13 +6,13 @@ import axios from 'axios'
  * @return {Promise<Array<ChatMessage>>}
  */
 export async function getMessages() {
-    const { data } = await axios.get('http://localhost:3000/messages')
+    const { data } = await axios.get('http://localhost:8080/messages')
 
-    const result = data.items.map(item => ({
-        username: item.Username,
-        message: item.Message,
-        createTime: new Date(item.CreateTime)
+    const messages = data.items.map(item => ({
+        username: item.username,
+        message: item.message,
+        createTime: new Date(item.createTime)
     }));
 
-    return result;
+    return messages;
 }
