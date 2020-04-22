@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react"
 import { Button, Input, Container, List, ListItem } from '@material-ui/core'
+import useWebSocket, { ReadyState } from 'react-use-websocket';
+
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -9,6 +11,7 @@ import { getMessages } from "../services/messages";
 
 
 const ChatPage = () => {
+    const [publishMessage, lastMessage, readyState, getWebSocket] = useWebSocket('ws://localhost:8080/ws');
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState([])
     const username = localStorage.getItem('username')
@@ -19,8 +22,19 @@ const ChatPage = () => {
         // TODO: show loader until messages are received
         getMessages()
             .then(setMessages)
-            .catch(console.error)  
+            .catch(console.error)
     }, [])
+
+    useEffect(() => {
+        if (lastMessage !== null) {
+            // getWebSocket returns the WebSocket wrapped in a Proxy.
+            // This is to restrict actions like mutating a shared websocket, overwriting handlers, etc
+            const currentWebsocketUrl = getWebSocket().url;
+            console.log('received a message from ', currentWebsocketUrl, lastMessage.data);
+
+            addMessage(lastMessage.data)
+        }
+    }, [lastMessage]);
 
     /**
      * 
@@ -35,11 +49,14 @@ const ChatPage = () => {
 
     const clearText = () => setMessage('')
 
-    const sendMessage = () => {
-        // TODO: call service instead of appending in memory
+    const addMessage = (message = '') => {
         setMessages(messages.concat([buildMessage(message)]));
+    }
+
+    const sendMessage = () => {
+        addMessage(message);
+        publishMessage(message);
         clearText();
-        return false;
     }
 
     // TODO: Check if user is logged in before loading page
@@ -47,7 +64,7 @@ const ChatPage = () => {
         <Layout>
             <SEO title="Chat" />
             <Container>
-                <Chat messages={messages}/>
+                <Chat messages={messages} />
                 <form onSubmit={e => { e.preventDefault(); sendMessage() }}>
                     <Input required value={message} onChange={e => setMessage(e.target.value)} />
                     <Button type="submit">Send</Button>
@@ -64,6 +81,8 @@ const ChatPage = () => {
  */
 const Chat = (props) => {
     const { messages } = props
+
+    console.debug('Messages', messages)
 
     const messageListItems = messages.map(message => (
         <ListItem key={`${message.username}:${message.createTime.getMilliseconds()}`}>
