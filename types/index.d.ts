@@ -3,5 +3,5 @@ export interface ChatMessage {
     username: String
 
     /** Time the message was created */
-    createTime: Date
+    createTime: number
 }
