@@ -68,7 +68,7 @@ const ChatPage = () => {
         <Layout>
             <SEO title="Chat" />
             <Container>
-                <Chat messages={messages} />
+                <Chat messages={messages} loggedInUsername={username} />
                 <form onSubmit={e => { e.preventDefault(); sendMessage() }}>
                     <Input required value={message} onChange={e => setMessage(e.target.value)} />
                     <Button type="submit">Send</Button>
@@ -82,17 +82,25 @@ const ChatPage = () => {
  * 
  * @param {object} props
  * @param {Array<ChatMessage>} props.messages
+ * @param {string} props.loggedInUsername
  */
 const Chat = (props) => {
-    const { messages } = props
+    const { messages, loggedInUsername } = props
 
     console.log('Messages', messages)
 
-    const messageListItems = messages.map(message => (
-        <ListItem key={`${message.username}:${message.createTime}`}>
-            <span>{message.username}: {message.message}</span>
-        </ListItem>
-    ))
+    const messageListItems = messages.map(message => {
+        const { username, createTime, message: messageValue } = message
+        const usernameElement = username === loggedInUsername
+            ? <b>Me</b>
+            : username
+
+        return (
+            <ListItem key={`${username}:${createTime}`}>
+                <span>{usernameElement}: {messageValue}</span>
+            </ListItem>
+        )
+    })
 
     return <List>{messageListItems}</List>
 }
