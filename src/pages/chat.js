@@ -2,16 +2,16 @@
 
 import React, { useState, useEffect } from "react"
 import { Button, Input, Container, List, ListItem } from '@material-ui/core'
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+import useWebSocket, { ReadyState } from 'react-use-websocket'
 
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import { getMessages } from "../services/messages";
+import { getMessages } from "../services/messages"
 
 
 const ChatPage = () => {
-    const [publishMessage, lastMessage, readyState, getWebSocket] = useWebSocket('ws://localhost:8080/ws');
+    const [publishMessage, lastMessage, readyState, getWebSocket] = useWebSocket('ws://localhost:8080/ws')
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState([])
     const username = localStorage.getItem('username')
@@ -29,17 +29,18 @@ const ChatPage = () => {
         if (lastMessage !== null) {
             // getWebSocket returns the WebSocket wrapped in a Proxy.
             // This is to restrict actions like mutating a shared websocket, overwriting handlers, etc
-            const currentWebsocketUrl = getWebSocket().url;
-            console.log('received a message from ', currentWebsocketUrl, lastMessage.data);
+            const currentWebsocketUrl = getWebSocket().url
+            const messageData = JSON.parse(lastMessage.data)
+            console.log('received a message from ', currentWebsocketUrl, typeof (messageData), messageData)
 
-            addMessage(lastMessage.data)
+            addMessage(messageData)
         }
-    }, [lastMessage]);
+    }, [lastMessage])
 
     /**
      * 
      * @param {String} message
-     * @returns {ChatMessage} 
+     * @returns {ChatMessage}
      */
     const buildMessage = message => ({
         message,
@@ -49,14 +50,17 @@ const ChatPage = () => {
 
     const clearText = () => setMessage('')
 
-    const addMessage = (message = '') => {
-        setMessages(messages.concat([buildMessage(message)]));
-    }
+    /**
+     * 
+     * @param {ChatMessage} message
+     */
+    const addMessage = message => setMessages(messages.concat([message]))
 
     const sendMessage = () => {
-        addMessage(message);
-        publishMessage(message);
-        clearText();
+        const chatMessage = buildMessage(message)
+        console.log('Publishing message', chatMessage)
+        publishMessage(JSON.stringify(chatMessage))
+        clearText()
     }
 
     // TODO: Check if user is logged in before loading page
@@ -82,7 +86,7 @@ const ChatPage = () => {
 const Chat = (props) => {
     const { messages } = props
 
-    console.debug('Messages', messages)
+    console.log('Messages', messages)
 
     const messageListItems = messages.map(message => (
         <ListItem key={`${message.username}:${message.createTime}`}>
