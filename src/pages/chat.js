@@ -11,7 +11,16 @@ import { getMessages } from "../services/messages"
 
 
 const ChatPage = () => {
-    const [publishMessage, lastMessage, readyState, getWebSocket] = useWebSocket('ws://localhost:8080/ws')
+    const [publishMessage, lastMessage, readyState, getWebSocket] = useWebSocket('ws://localhost:8080/ws', {
+        enforceStaticOptions: false,
+        // TODO: Add UI indicator when connection is closed
+        onClose: e => console.log("Websocket connection closed"),
+        onOpen: e => console.log("Websocket connection opened"),
+        onError: e => console.log("Websocket error", e.target),
+        shouldReconnect: e => true,
+        reconnectAttempts: 20,
+        reconnectInterval: 2000
+    })
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState([])
     const username = localStorage.getItem('username')
