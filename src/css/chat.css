@@ -1,0 +1,21 @@
+#container {
+    height: 80vh;
+    overflow: hidden;
+}
+
+#chatbox {
+    height: 75%;
+    overflow-y: scroll;
+    overflow-x: auto;
+    border-style: ridge;
+}
+
+#chatmessage {
+    grid-row: auto;
+    margin-top: 0.8em;
+}
+
+#chatinput {
+    display: grid;
+    grid-template-columns: 85% 15%;
+}

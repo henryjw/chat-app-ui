@@ -1,13 +1,15 @@
 /** @typedef { import('../../types').ChatMessage } ChatMessage  */
 
 import React, { useState, useEffect } from "react"
-import { Button, Input, Container, List, ListItem } from '@material-ui/core'
+import { Button, Input, Container, List, ListItem, Divider, TextField } from '@material-ui/core'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { getMessages } from "../services/messages"
+
+import "../css/chat.css"
 
 
 const ChatPage = () => {
@@ -76,10 +78,10 @@ const ChatPage = () => {
     return (
         <Layout>
             <SEO title="Chat" />
-            <Container>
-                <Chat messages={messages} loggedInUsername={username} />
-                <form onSubmit={e => { e.preventDefault(); sendMessage() }}>
-                    <Input required value={message} onChange={e => setMessage(e.target.value)} />
+            <Container id="container">
+                <Chat id="chatbox" messages={messages} loggedInUsername={username} />
+                <form id="chatinput" onSubmit={e => { e.preventDefault(); sendMessage() }}>
+                    <TextField required value={message} onChange={e => setMessage(e.target.value)} variant="outlined" multiline={true} />
                     <Button type="submit">Send</Button>
                 </form>
             </Container>
@@ -90,28 +92,38 @@ const ChatPage = () => {
 /**
  * 
  * @param {object} props
+ * @param {string} props.id
  * @param {Array<ChatMessage>} props.messages
  * @param {string} props.loggedInUsername
  */
 const Chat = (props) => {
-    const { messages, loggedInUsername } = props
+    const { messages, loggedInUsername, id } = props
 
     console.log('Messages', messages)
 
-    const messageListItems = messages.map(message => {
+    const messageListItems = messages.map((message, index) => {
         const { username, createTime, message: messageValue } = message
         const usernameElement = username === loggedInUsername
             ? <b>Me</b>
             : username
 
+        const isLastItem = index === messages.length - 1
+
         return (
-            <ListItem key={`${username}:${createTime}`}>
-                <span>{usernameElement}: {messageValue}</span>
-            </ListItem>
+            <>
+                <ListItem id="chatmessage" key={`${username}:${createTime}`}>
+                    <span>{usernameElement}: {messageValue}</span>
+                </ListItem>
+                <Divider light hidden={isLastItem} />
+            </>
         )
     })
 
-    return <List>{messageListItems}</List>
+    return (
+        <div id={id}>
+            <List>{messageListItems}</List>
+        </div>
+    )
 }
 
 export default ChatPage
