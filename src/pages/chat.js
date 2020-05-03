@@ -16,13 +16,14 @@ const ChatPage = () => {
     const [publishMessage, lastMessage, readyState, getWebSocket] = useWebSocket('ws://localhost:8080/ws', {
         enforceStaticOptions: false,
         // TODO: Add UI indicator when connection is closed
-        onClose: e => console.log("Websocket connection closed"),
-        onOpen: e => console.log("Websocket connection opened"),
-        onError: e => console.log("Websocket error", e.target),
+        onClose: e => console.log("Websocket connection closed", e.target),
+        onOpen: e => console.log("Websocket connection opened", e.target),
+        onError: e => console.error("Websocket error", e.target),
         shouldReconnect: e => true,
         reconnectAttempts: 20,
-        reconnectInterval: 2000
+        reconnectInterval: 2000,
     })
+
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState([])
     const username = localStorage.getItem('username')
@@ -79,9 +80,10 @@ const ChatPage = () => {
         <Layout>
             <SEO title="Chat" />
             <Container id="container">
+                {/* FIXME: Prevent the entire component from re-rendering whenever the input changes. */}
                 <Chat id="chatbox" messages={messages} loggedInUsername={username} />
                 <form id="chatinput" onSubmit={e => { e.preventDefault(); sendMessage() }}>
-                    <TextField required value={message} onChange={e => setMessage(e.target.value)} variant="outlined" multiline={true} />
+                    <TextField required value={message} onChange={e => setMessage(e.target.value)} variant="outlined" multiline={false} />
                     <Button type="submit">Send</Button>
                 </form>
             </Container>

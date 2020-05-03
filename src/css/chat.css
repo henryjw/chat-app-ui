@@ -1,5 +1,5 @@
 #container {
-    height: 80vh;
+    height: 85vh;
     overflow: hidden;
 }
 
@@ -17,5 +17,5 @@
 
 #chatinput {
     display: grid;
-    grid-template-columns: 85% 15%;
+    grid-template-columns: 1fr 5%;
 }
