@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react"
 import { Button, Input, Container, List, ListItem, Divider, TextField } from '@material-ui/core'
+import Alert from '@material-ui/lab/Alert'
 import useWebSocket, { ReadyState } from 'react-use-websocket'
 
 
@@ -13,12 +14,25 @@ import "../css/chat.css"
 
 
 const ChatPage = () => {
+    const [reconnecting, setReconnecting] = useState(false);
     const [publishMessage, lastMessage, readyState, getWebSocket] = useWebSocket('ws://localhost:8080/ws', {
         enforceStaticOptions: false,
-        // TODO: Add UI indicator when connection is closed
-        onClose: e => console.log("Websocket connection closed", e.target),
-        onOpen: e => console.log("Websocket connection opened", e.target),
-        onError: e => console.error("Websocket error", e.target),
+        onClose: e => {
+            setReconnecting(true)
+            console.log("Websocket connection closed", e.target)
+        },
+        onOpen: e => {
+            // TODO: fetch the messages from the backend after connecting
+            setReconnecting(false);
+            console.log("Websocket connection opened", e.target);
+            getMessages()
+                .then(setMessages)
+                .catch(console.error)
+        },
+        onError: e => {
+            setReconnecting(true);
+            console.error("Websocket error", e.target)
+        },
         shouldReconnect: e => true,
         reconnectAttempts: 20,
         reconnectInterval: 2000,
@@ -27,15 +41,6 @@ const ChatPage = () => {
     const [message, setMessage] = useState('')
     const [messages, setMessages] = useState([])
     const username = localStorage.getItem('username')
-
-    // This should only be called when component is loaded
-    // https://stackoverflow.com/a/53121021/6530609
-    useEffect(() => {
-        // TODO: show loader until messages are received
-        getMessages()
-            .then(setMessages)
-            .catch(console.error)
-    }, [])
 
     useEffect(() => {
         if (lastMessage !== null) {
@@ -79,12 +84,16 @@ const ChatPage = () => {
     return (
         <Layout>
             <SEO title="Chat" />
+            <div hidden={!reconnecting}>
+                {/* Alert is wrapped in `div` because it doesn't expose the `hidden` prop */}
+                <Alert severity="warning" >We're unable to connect to our servers. Reconnecting...</Alert>
+            </div>
             <Container id="container">
                 {/* FIXME: Prevent the entire component from re-rendering whenever the input changes. */}
                 <Chat id="chatbox" messages={messages} loggedInUsername={username} />
                 <form id="chatinput" onSubmit={e => { e.preventDefault(); sendMessage() }}>
-                    <TextField required value={message} onChange={e => setMessage(e.target.value)} variant="outlined" multiline={false} />
-                    <Button type="submit">Send</Button>
+                    <TextField required value={message} onChange={e => setMessage(e.target.value)} variant="outlined" multiline={false} disabled={reconnecting} />
+                    <Button type="submit" disabled={reconnecting}>Send</Button>
                 </form>
             </Container>
         </Layout>
